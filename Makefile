@@ -8,7 +8,7 @@ LATEST_VERSION=15-3.3
 # that may have been specified, and are used by rules to determine which
 # versions/variants are to be processed.  If no VERSION or VARIANT environment
 # variables were specified, process everything (the default).
-do_default=true
+do_default=false
 do_alpine=true
 
 # The following logic evaluates VERSION and VARIANT variables that may have

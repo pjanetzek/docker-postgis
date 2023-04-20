@@ -51,16 +51,35 @@ RUN set -eux \
         ca-certificates \
         openssl \
         tar \
+        libarchive-tools \
+        cgal \
     \
-    && wget -O postgis.tar.gz "https://github.com/postgis/postgis/archive/${POSTGIS_VERSION}.tar.gz" \
-    && echo "${POSTGIS_SHA256} *postgis.tar.gz" | sha256sum -c - \
+    && wget -O postgis.zip "https://github.com/pjanetzek/postgis/archive/refs/heads/sfcgal-straightskeleton-with-distance.zip" \
     && mkdir -p /usr/src/postgis \
-    && tar \
+    && bsdtar \
         --extract \
-        --file postgis.tar.gz \
+        --file postgis.zip \
         --directory /usr/src/postgis \
         --strip-components 1 \
-    && rm postgis.tar.gz \
+    && rm postgis.zip \
+    \
+    && wget -O cgal.tar.gz "https://github.com/CGAL/cgal/releases/download/v5.5.2/CGAL-5.5.2-library.tar.xz" \
+    && mkdir -p /usr/src/cgal \
+    && bsdtar \
+        --extract \
+        --file cgal.tar.gz \
+        --directory /usr/src/cgal \
+        --strip-components 1 \
+    && rm cgal.tar.gz \
+    \
+    && wget -O sfcgal.tar.gz "https://gitlab.com/Oslandia/SFCGAL/-/archive/master/SFCGAL-master.tar.gz" \
+    && mkdir -p /usr/src/sfcgal \
+    && bsdtar \
+        --extract \
+        --file sfcgal.tar.gz \
+        --directory /usr/src/sfcgal \
+        --strip-components 1 \
+    && rm sfcgal.tar.gz \
     \
     && apk add --no-cache --virtual .build-deps \
         \
@@ -83,6 +102,15 @@ RUN set -eux \
         pcre-dev \
         perl \
         protobuf-c-dev \
+        boost-dev \
+        cmake \
+    \
+# build SFCGAL
+    && cd /usr/src/sfcgal \
+    && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build ./build \
+    && cmake --install \
+    && make install \
     \
 # build PostGIS
     \
